@@ -8,6 +8,7 @@ from argparse import ArgumentParser # Argument parsing
 # 3rd-party
 import colorama as Color # Coloring
 from colorama import Fore,Back,Style # Coloring
+import textwrap
 
 class PassthiefOutputWriters(object):
 	"""Writers for the output."""
@@ -40,13 +41,26 @@ class PassthiefOutputWriters(object):
 				writeFile.write(repr(retValue[index+1]))
 				writeFile.write("\n\t}\n")
 			writeFile.write("}")
+	@staticmethod
+	def WriteHTML(outFile, retValue):
+		with open(outFile, "w") as writeFile:
+			html_str = ""
+			for index in range(0, len(retValue), 2):
+				html_str += textwrap.dedent("""\
+					<ul>
+						<li>{name} :
+							<ul>output : {repr_val}</ul>
+						</li>
+					</ul>""").format(name=retValue[index],repr_val=repr(retValue[index+1]))
+			writeFile.write(html_str)
 
 class PassthiefCore(object):
 	"""Core of the Passthief script"""
 	# Static variables
 	OutputWriters = { 'text' : PassthiefOutputWriters.WriteText,
 					   'yaml': PassthiefOutputWriters.WriteYAML,
-					   'json': PassthiefOutputWriters.WriteJSON}
+					   'json': PassthiefOutputWriters.WriteJSON,
+					   'html' : PassthiefOutputWriters.WriteHTML}
 	# Initializes the script
 	@staticmethod
 	def Initialize():
