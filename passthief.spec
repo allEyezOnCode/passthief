@@ -8,7 +8,7 @@ a = Analysis(['passthief.py'],
              binaries=[],
              datas=[],
 # First standard then 3rd party
-             hiddenimports=['os','sys','argparse','urlparse','platform','importlib','colorama','sqlite3','xml.etree.ElementTree','win32crypt','modules','binascii','subprocess','base64','hashlib'],
+             hiddenimports=['os','sys','argparse','urlparse','platform','importlib','colorama','sqlite3','xml.etree.ElementTree', 'xml.dom', 'textwrap','win32crypt','modules','binascii','subprocess','base64','hashlib', 'xhtml2pdf'],
              hookspath=[],
              runtime_hooks=[],
              excludes=['modules'],

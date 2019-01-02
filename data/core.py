@@ -3,12 +3,20 @@ from __future__ import print_function
 from importlib import import_module # For module loading
 from sys import path,executable,exit,version_info as version # For various reasons
 import os # Basic OS functions
+import textwrap
+import xml.etree.ElementTree as ET
+from xml.dom import minidom
 from time import localtime # For time operations
 from argparse import ArgumentParser # Argument parsing
+#different between python 2 and 3
+try:
+	import cStringIO
+except Exception:
+	import io as cStringIO 
 # 3rd-party
 import colorama as Color # Coloring
 from colorama import Fore,Back,Style # Coloring
-import textwrap
+import xhtml2pdf.pisa as pisa
 
 class PassthiefOutputWriters(object):
 	"""Writers for the output."""
@@ -43,24 +51,45 @@ class PassthiefOutputWriters(object):
 			writeFile.write("}")
 	@staticmethod
 	def WriteHTML(outFile, retValue):
+		html_str = ""
+		for index in range(0, len(retValue), 2):
+			html_str += textwrap.dedent("""\
+				<ul>
+					<li>{name} :
+						<ul>output : {repr_val}</ul>
+					</li>
+				</ul>""").format(name=retValue[index],repr_val=repr(retValue[index+1]))
 		with open(outFile, "w") as writeFile:
-			html_str = ""
-			for index in range(0, len(retValue), 2):
-				html_str += textwrap.dedent("""\
-					<ul>
-						<li>{name} :
-							<ul>output : {repr_val}</ul>
-						</li>
-					</ul>""").format(name=retValue[index],repr_val=repr(retValue[index+1]))
 			writeFile.write(html_str)
-
+	@staticmethod
+	def WriteXML(outFile, retValue): 
+		data = ET.Element('data')
+		for index in range(0,len(retValue), 2): 
+			items = ET.SubElement(data, 'items') 
+			items.set('name', retValue[index]) 
+			items.text = repr(retValue[index+1]) 
+			# create a new XML file with the results 
+			rough_string = ET.tostring(data, 'utf-8') 
+			reparsed = minidom.parseString(rough_string) 
+			data = reparsed.toprettyxml(indent=" ") 
+			with open(outFile, 'w') as file_xml: file_xml.write(data) 
+			
+	@staticmethod 
+	def WritePDF(outFile, retValue):
+		html_str = "" 
+		for index in range(0, len(retValue), 2):
+			html_str += textwrap.dedent("<ul> <li>{name} : <ul>output : {repr_val}</ul> </li> </ul>").format(name=retValue[index],repr_val=repr(retValue[index+1]))
+		pisa.CreatePDF(cStringIO.StringIO(html_str), open(outFile, 'wb'))
+	
 class PassthiefCore(object):
 	"""Core of the Passthief script"""
 	# Static variables
 	OutputWriters = { 'text' : PassthiefOutputWriters.WriteText,
 					   'yaml': PassthiefOutputWriters.WriteYAML,
 					   'json': PassthiefOutputWriters.WriteJSON,
-					   'html' : PassthiefOutputWriters.WriteHTML}
+					   'html' : PassthiefOutputWriters.WriteHTML,
+					   'xml' : PassthiefOutputWriters.WriteXML,
+					   'pdf' : PassthiefOutputWriters.WritePDF}
 	# Initializes the script
 	@staticmethod
 	def Initialize():
