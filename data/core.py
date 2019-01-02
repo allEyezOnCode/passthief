@@ -63,9 +63,9 @@ class PassthiefOutputWriters(object):
 			writeFile.write(html_str)
 	@staticmethod
 	def WriteXML(outFile, retValue): 
-		data = ET.Element('data')
+		data_elem = ET.Element('data')
 		for index in range(0,len(retValue), 2): 
-			items = ET.SubElement(data, 'items') 
+			items = ET.SubElement(data_elem, 'items') 
 			items.set('name', retValue[index]) 
 			items.text = repr(retValue[index+1]) 
 			# create a new XML file with the results 
