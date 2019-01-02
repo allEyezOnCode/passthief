@@ -72,7 +72,7 @@ class PassthiefOutputWriters(object):
 			rough_string = ET.tostring(data, 'utf-8') 
 			reparsed = minidom.parseString(rough_string) 
 			data = reparsed.toprettyxml(indent=" ") 
-			with open(outFile, 'w') as file_xml: file_xml.write(data) 
+		with open(outFile, 'w') as file_xml: file_xml.write(data) 
 			
 	@staticmethod 
 	def WritePDF(outFile, retValue):
