@@ -69,7 +69,7 @@ class PassthiefOutputWriters(object):
 			items.set('name', retValue[index]) 
 			items.text = repr(retValue[index+1]) 
 			# create a new XML file with the results 
-			rough_string = ET.tostring(data, 'utf-8') 
+			rough_string = ET.tostring(data_elem, 'utf-8') 
 			reparsed = minidom.parseString(rough_string) 
 			data = reparsed.toprettyxml(indent=" ") 
 		with open(outFile, 'w') as file_xml: file_xml.write(data) 
